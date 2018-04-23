@@ -10,19 +10,18 @@ import java.util.ArrayList;
 public class Servidor extends Thread {
     private String nombreCliente;
     private BufferedReader entrada;
-    public ArrayList<Cliente> clientes = new ArrayList<Cliente>();
-    
+    public static ArrayList<Cliente> clientes = new ArrayList<Cliente>();
     
     //Método constructor
     public Servidor(Socket s) throws IOException {
         entrada = new BufferedReader(new InputStreamReader(s.getInputStream()));
         nombreCliente = s.getInetAddress().getCanonicalHostName();
-        clientes.add(new Cliente(nombreCliente, s.getInetAddress().toString()));
         System.out.println("Conexión aceptada desde " + s.getRemoteSocketAddress());        //Devuelve la conexión de donde se conecto el servidor
+        clientes.add(new Cliente(s.getInetAddress().getCanonicalHostName(), s.getInetAddress()));
+        clientes.get(clientes.size()).isOn = true;
     }
-    
-    
-    //Método para que reciva el flujo de entrada (las cadenas)
+
+    //Método para que reciba el flujo de entrada (las cadenas)
     public String recibir() throws IOException {
         String str = entrada.readLine();
         return str;
@@ -33,14 +32,58 @@ public class Servidor extends Thread {
         entrada.close();
     }
     
+    public void list(){
+    	for(int i = 0; i < clientes.size(); i++) {
+        	System.out.println("Cliente " + i + ": " + clientes.get(i).getNombre());
+        }
+    }
+    
+  	public void textTo(){
+    	list();
+    	System.out.print("Ingresa el indice del usuario a quien deseas mandar un mensaje: ");
+        
+    }
+    
+
     @Override
     public void run() {
         try {
             String cadena = "";
-            do {
-                cadena = recibir();
-                System.out.println(nombreCliente + " dice: " + cadena);
-            } while (!cadena.equals("salir"));
+            while (!cadena.equals("salir")) {
+            	cadena = recibir();
+                cadena = cadena.toUpperCase();
+                switch (cadena) {
+                	case "LIST":
+                            list();
+                    	break;
+                        
+                    case "SALIR":
+                            System.out.println("El usuario " + nombreCliente  + " ha abandonado el chat");
+                  		break;
+                        
+                    case "TEXT_TO":
+							
+                    	break;
+                        
+                    case "QUIT":   
+
+                    	break;
+                        
+                    case "TEXT":
+                    	
+                    	break;
+                        
+                    case "SEND_FILE":
+                    
+                    	break;
+                        
+                    default:
+                    	System.out.println("Comando no válido!");
+                        break;
+                }
+                //System.out.println(nombreCliente + " dice: " + cadena);  
+            }
+            
             
         } catch (IOException e) {
             System.out.println("Se cerró la conexión con " + nombreCliente);
@@ -50,5 +93,19 @@ public class Servidor extends Thread {
             } catch (IOException e) {}
         }
     }
+    
+    public static void main(String[] args) throws IOException {
+        ServerSocket ss;
+        ss = new ServerSocket(0);
+        System.out.println("Servidor aceptando conexiones en el puerto " + ss.getLocalPort());//Con este método veo qué puerto es el que está aceptando la conexión
+        while (true) {
+            Socket cliente = ss.accept();  //Está a la espera de la conexión
+            Servidor hilo = new Servidor(cliente);
+            hilo.start();
+            
+        }
+    }
+
 }
+
 
