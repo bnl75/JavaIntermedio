@@ -21,9 +21,14 @@ public class Cliente {
     private int port;       //Porque con 0 toma un valor aleatorio
     private String add = " ";
     public Boolean isOn = false;
+    public Socket s;
     
     public Cliente() {
         
+    }
+    
+    public Cliente(Socket s) {
+        this.s = s;
     }
     
     public Cliente(String nombre, InetAddress host){
@@ -56,8 +61,12 @@ public class Cliente {
     }
     
     public void conectar() throws IOException {
-        Socket s = new Socket(host, port);
+        s = new Socket(host, port);
         ps = new PrintStream(s.getOutputStream());
+    }
+
+    public Socket getS() {
+        return s;
     }
     
     public void enviar(String mensaje) throws IOException {
@@ -117,75 +126,3 @@ public class Cliente {
     }
     
 }
-
-
-
-/*public class Cliente {
-    public String nombre;
-    public String host;
-    public int port;
-    public Boolean isOn = false;
-    private PrintStream ps;
-    
-    public Cliente() {
-        
-    }
-    
-   
-    public Cliente(String nombre, String host){
-        this.nombre = nombre;
-        //this.host = host;
-    }
-    
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-    
-    public void conectar() throws IOException {
-        Socket s = new Socket(host, port);
-        ps = new PrintStream(s.getOutputStream());
-    }
-    
-    public void enviar(String mensaje) throws IOException {
-        ps.println(mensaje);
-    }
-    
-    public void cerrar() throws IOException {
-        ps.close();
-    }
-    
-    public static void main(String[] args) throws IOException {
-        BufferedReader teclado = new BufferedReader(new InputStreamReader(System.in));
-        
-        Cliente cliente = new Cliente();
-        
-        System.out.print("Host: ");//Para ver a que dir ip se va a conectar
-        cliente.setHost(teclado.readLine());
-        
-        System.out.print("Puerto: ");
-        cliente.setPort(Integer.parseInt(teclado.readLine()));
-        
-        cliente.conectar();
-        
-        String cadena = "";
-        
-        while (!cadena.equals("salir")) {
-            System.out.print("Mensaje: ");
-            cadena = teclado.readLine();
-            
-            cliente.enviar(cadena);
-        }
-        
-        cliente.cerrar();
-        
-    }
-    
-}*/

@@ -9,11 +9,14 @@ import java.util.ArrayList;
 
 public class Servidor extends Thread {
     private String nombreCliente;
+    public Cliente usuario;
     private BufferedReader entrada;
     public static ArrayList<Cliente> clientes = new ArrayList<Cliente>();
     
     //Método constructor
-    public Servidor(Socket s) throws IOException {
+    public Servidor(Cliente usuario) throws IOException {
+        this.usuario = usuario;
+        Socket s = usuario.getS();
         entrada = new BufferedReader(new InputStreamReader(s.getInputStream()));
         nombreCliente = s.getInetAddress().getCanonicalHostName();
         System.out.println("Conexión aceptada desde " + s.getRemoteSocketAddress());        //Devuelve la conexión de donde se conecto el servidor
@@ -52,33 +55,34 @@ public class Servidor extends Thread {
             while (!cadena.equals("salir")) {
             	cadena = recibir();
                 cadena = cadena.toUpperCase();
+                
                 switch (cadena) {
-                	case "LIST":
-                            list();
-                    	break;
+                    case "LIST":
+                        list();
+                        break;
                         
                     case "SALIR":
-                            System.out.println("El usuario " + nombreCliente  + " ha abandonado el chat");
-                  		break;
+                        System.out.println("El usuario " + nombreCliente  + " ha abandonado el chat");
+                        break;
                         
                     case "TEXT_TO":
-							
-                    	break;
                         
-                    case "QUIT":   
-
-                    	break;
+                        break;
+                        
+                    case "QUIT":
+                        clientes.remove(usuario);
+                        break;
                         
                     case "TEXT":
-                    	
-                    	break;
+                        
+                        break;
                         
                     case "SEND_FILE":
-                    
-                    	break;
+                        
+                        break;
                         
                     default:
-                    	System.out.println("Comando no válido!");
+                        System.out.println("Comando no válido!");
                         break;
                 }
                 //System.out.println(nombreCliente + " dice: " + cadena);  
